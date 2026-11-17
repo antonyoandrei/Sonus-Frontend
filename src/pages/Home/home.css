@@ -1,0 +1,133 @@
+.home-listen {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 1.5rem 0 8.5rem;
+}
+
+.home-listen__intro {
+  margin-bottom: 1.8rem;
+}
+
+.home-listen__intro h1 {
+  margin: 0.35rem 0 0.55rem;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-weight: 680;
+  letter-spacing: -0.045em;
+}
+
+.home-listen__intro p:not(.brand-eyebrow) {
+  max-width: 44ch;
+  color: var(--sonus-muted);
+  font-size: 0.95rem;
+}
+
+.home-featured {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: 2.8rem;
+  border-radius: 20px;
+  padding: 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+.home-featured__art {
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.home-featured__art img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-featured__art:hover img,
+.home-featured__art:focus-visible img {
+  transform: scale(1.04);
+}
+
+.home-featured__copy p:first-child {
+  color: var(--sonus-accent);
+  font-size: 0.7rem;
+  font-weight: 720;
+}
+
+.home-featured__copy h2 {
+  margin: 0.35rem 0 0.25rem;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.home-featured__copy > a {
+  color: var(--sonus-muted);
+  font-size: 0.92rem;
+}
+
+.home-featured__copy > a:hover,
+.home-featured__copy > a:focus-visible {
+  color: var(--sonus-text);
+}
+
+.home-featured__copy > p:last-of-type {
+  max-width: 46ch;
+  margin: 0.8rem 0 1.2rem;
+  color: var(--sonus-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.home-listen__section {
+  margin-top: 2.2rem;
+}
+
+.home-listen .brand-shelf {
+  grid-auto-columns: 176px;
+}
+
+.home-listen .brand-playlist-card,
+.home-listen .brand-release-card {
+  width: 176px;
+}
+
+@media (max-width: 760px) {
+  .home-listen {
+    width: calc(100% - 28px);
+  }
+
+  .home-featured {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: 2.8rem;
+  border-radius: 20px;
+  padding: 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+  .home-featured__art {
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.2);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-featured__art img {
+    transition: none;
+  }
+}

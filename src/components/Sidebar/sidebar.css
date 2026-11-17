@@ -9,7 +9,7 @@
 
 .control-panel-logo {
     width: 170px;
-    background: url(https://res.cloudinary.com/du94mex28/image/upload/v1697795732/sonus/sonus-full-white-fa2_uyyc1c.png) no-repeat;
+    background: url(../../assets/brand/sonus-wordmark-white.png) no-repeat;
     background-size: contain;
     height: 60px;
 }
@@ -18,8 +18,7 @@
     margin-bottom: 30px;
     margin-top: 30px;
     height: 2px;
-    background: url(https://res.cloudinary.com/du94mex28/image/upload/v1697795732/sonus/Line_3_b3tjw5.png) no-repeat;
-    background-size: contain;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
     width: 215px;
 }
 

@@ -3,23 +3,25 @@ import { Link, NavLink } from "react-router-dom";
 import Player from "../../components/Player/Player";
 import Navbar from "../../components/Navbar/Navbar";
 import "./sidebar.css";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import spain from '../../assets/svg/spain.svg';
 import uk from '../../assets/svg/united kingdom.svg';
-import { usePlayer } from "../../context/PlayerContext";
+import { usePlayer } from "../../utils/usePlayer";
 import { useUserContext } from '../../utils/useUserContext';
 import { getLikedSongsByUserId, unlikeSong, updateUserLikes } from '../../services/song.service';
 import i18n from '../../i18n';
+import { useAuth } from '../../auth/useAuth';
 
 const useLikedSongState = (currentSongId: string | undefined) => {
     const { currentUser } = useUserContext();
+    const { getAccessTokenSilently } = useAuth();
     const [isLiked, setIsLiked] = useState<boolean>(false);
   
     useEffect(() => {
       const fetchLikedSongs = async () => {
         try {
           if (currentUser?.id && currentSongId) {
-            const likedSongs = await getLikedSongsByUserId(currentUser.id.toString());
+            const likedSongs = await getLikedSongsByUserId(currentUser.id, getAccessTokenSilently);
             const isLiked = likedSongs.some((likedSong: { id: string }) => likedSong.id === currentSongId);
             setIsLiked(isLiked);
           }
@@ -29,13 +31,14 @@ const useLikedSongState = (currentSongId: string | undefined) => {
       };
   
       fetchLikedSongs();
-    }, [currentUser?.id, currentSongId]);  
+    }, [currentSongId, currentUser?.id, getAccessTokenSilently]);
     return { isLiked, setIsLiked };
 };
 
 const Sidebar = () => {
-    const { currentSong, shuffleSongs, isShuffled, setIsShuffled } = usePlayer();
+    const { currentSong, shuffleSongs, isShuffled } = usePlayer();
     const { currentUser } = useUserContext();
+    const { getAccessTokenSilently } = useAuth();
     const { isLiked, setIsLiked } = useLikedSongState(currentSong?.id ? currentSong.id.toString() : undefined);
 
     const changeLanguage = (language: string) => {
@@ -48,30 +51,18 @@ const Sidebar = () => {
         }
     };
 
-    useEffect(() => {
-        setIsLiked((currentSong?.isLiked || false) as boolean);
-    }, [currentUser?.id, setIsLiked]);
-
     const handleLike = async () => {
-        if (currentUser && currentSong) {
+        if (currentUser && currentSong?.providerId === 'sonus') {
         try {
             const updatedIsLiked = !isLiked;
 
             setIsLiked(updatedIsLiked);
 
-            currentSong.isLiked = updatedIsLiked;
-
+            const token = await getAccessTokenSilently();
             if (updatedIsLiked) {
-                await updateUserLikes(
-                    currentUser.id.toString(),
-                    currentSong.id.toString(),
-                    true
-            );
+                await updateUserLikes(currentUser.id, currentSong.id, true, token);
             } else {
-                await unlikeSong(
-                    currentUser.id.toString(),
-                    currentSong.id.toString()
-                );
+                await unlikeSong(currentUser.id, currentSong.id, token);
             }
         } catch (error) {
             console.error("Error in handleLike:", error);
@@ -81,9 +72,9 @@ const Sidebar = () => {
         
     const [isElementHidden, setIsElementHidden] = useState(true);
 
-    const toggleElement = () => {
-        setIsElementHidden(!isElementHidden);
-    };
+    const toggleElement = useCallback(() => {
+        setIsElementHidden((isHidden) => !isHidden);
+    }, []);
 
     useEffect(() => {
         const handleOutsideClick = (e: Event) => {
@@ -113,14 +104,10 @@ const Sidebar = () => {
             document.removeEventListener("mousedown", handleOutsideClick);
             document.removeEventListener("keydown", handleEscapeKey);
         };
-    }, [isElementHidden]);
+    }, [isElementHidden, toggleElement]);
 
     const handleShuffleClick = () => {
-        setIsShuffled((prevIsShuffled) => {
-            const newIsShuffled = !prevIsShuffled;
-            shuffleSongs();
-            return newIsShuffled;
-        });
+        shuffleSongs();
     };
     
     return (
@@ -143,14 +130,14 @@ const Sidebar = () => {
                     <div className="divider" />
                     <article className="player">
                         <div className="img-song">
-                            <div style={{ backgroundImage: `url(${currentSong?.cover})` }} className="song-thumbnail" />
+                            <div style={{ backgroundImage: `url(${currentSong?.coverUrl ?? ""})` }} className="song-thumbnail" />
                             <div className="song-details">
-                                <p className="song-title">{currentSong?.name || '‎'}</p>
-                                <Link to={`/artist/${currentSong?.Artist[0].id}`} className="song-artist">{currentSong?.Artist[0].name || '‎'}</Link>
+                                <p className="song-title">{currentSong?.title || '‎'}</p>
+                                <Link to={`/artist/${currentSong?.artists[0]?.id ?? ""}`} className="song-artist">{currentSong?.artists[0]?.name || '‎'}</Link>
                             </div>
                         </div>
                         <div className="icons-wrapper">
-                            <div className="fav-icon">
+                            {currentSong?.providerId === 'sonus' && <div className="fav-icon">
                                 <div className="handle-like-wrapper" onClick={() => handleLike() }>
                                     {isLiked ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" className="icon-tabler icon-tabler-heart-filled" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -163,7 +150,7 @@ const Sidebar = () => {
                                         </svg>
                                     )}
                                 </div>
-                            </div>
+                            </div>}
                             <div className="shuffle-icon">
                                 <div onClick={() => handleShuffleClick()} className="handle-shuffle-wrapper">
                                     {isShuffled ? (

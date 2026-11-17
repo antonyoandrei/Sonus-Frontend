@@ -1,32 +1,20 @@
 import React from 'react'
-import { useAuth0 } from "@auth0/auth0-react";
-import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom"
+import { useAuth } from "../auth/useAuth";
 
 interface PrivateRoutesProps {
     children: React.ReactNode;
 }
 
 const PrivateRoutes: React.FC<PrivateRoutesProps> = ({ children }) => {
-    const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+    const { authMode, isAuthenticated, isLoading } = useAuth();
     const location = useLocation();
-    const [initializing, setInitializing] = useState(true);
 
-    useEffect(() => {
-        const redirect = async () => {
-        if (!isAuthenticated && !isLoading) {
-            await loginWithRedirect({
-            appState: { targetUrl: location.pathname }
-            });
-        } else {
-            setInitializing(false);
-        }
-        };
+    if (authMode === "demo") {
+        return children;
+    }
 
-        redirect();
-    }, [isAuthenticated, isLoading, loginWithRedirect, location.pathname]);
-
-    if (isLoading || initializing) {
+    if (isLoading) {
         return (
             <div className="loader-wrapper">
                 <div className="dot-spinner">
@@ -43,7 +31,12 @@ const PrivateRoutes: React.FC<PrivateRoutesProps> = ({ children }) => {
         );
     }
 
-    return isAuthenticated ? children : <Navigate to={"/"} />
+    if (!isAuthenticated) {
+        const next = `${location.pathname}${location.search}${location.hash}`;
+        return <Navigate replace to={`/auth?next=${encodeURIComponent(next)}`} />;
+    }
+
+    return children;
 }
 
 export default PrivateRoutes

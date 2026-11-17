@@ -12,12 +12,16 @@
     "test": "jest"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.2.3",
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@gsap/react": "^2.1.2",
+    "@supabase/supabase-js": "2.112.4",
     "@types/i18next": "^13.0.0",
     "@types/react-i18next": "^8.1.0",
-    "auth0": "^4.1.0",
+    "gsap": "^3.15.0",
     "i18next": "^23.7.7",
     "json-server": "^0.17.4",
+    "lucide": "1.28.0",
+    "morphicons": "1.7.0",
     "react": "^18.2.0",
     "react-audio-player": "^0.17.0",
     "react-content-loader": "^6.2.1",
@@ -56,5 +60,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "vite": "^4.4.5"
-  }
+  },
+  "packageManager": "pnpm@8.15.9+sha512.499434c9d8fdd1a2794ebf4552b3b25c0a633abcee5bb15e7b5de90f32f47b513aca98cd5cfd001c31f0db454bc3804edccd578501e4ca293a6816166bbd9f81"
 }

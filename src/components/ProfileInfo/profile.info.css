@@ -16,6 +16,10 @@
     background-repeat: no-repeat;
 }
 
+.user-img.profile-avatar-initials {
+    font-size: 3.4rem;
+}
+
 .hover-cam{
     display: none;
     width: 180px;
@@ -32,6 +36,37 @@
 .email-user{
     font-size: var(--fs-2);
     color: white;
+}
+
+.profile-content {
+    padding-top: 8rem;
+}
+
+.profile-identity {
+    flex-wrap: wrap;
+}
+
+.profile-kicker {
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+}
+
+.profile-bio {
+    max-width: 520px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.profile-private-badge {
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    padding: 0.35rem 0.65rem;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.78rem;
 }
 
 .user-details {
@@ -82,6 +117,11 @@
     border-radius: 10px;
 }
 
+.follow-btn:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
 .follow-btn-text {
     color: var(--clr-white);
     transition: opacity 0.1s;
@@ -103,9 +143,123 @@
     align-items: center;
 }
 
+.followers-wrapper strong {
+    color: var(--clr-white);
+    font-size: 1.2rem;
+}
+
+.followers-wrapper span {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.82rem;
+}
+
 .follow-container {
     display: flex;
     gap: 2rem;
+}
+
+.profile-edit-button,
+.profile-save-button {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--clr-white);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile-edit-form {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 760px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    margin: 3rem 0;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.profile-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.profile-edit-form label {
+    display: grid;
+    gap: 0.55rem;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.82rem;
+}
+
+.profile-edit-form input[type="text"],
+.profile-edit-form textarea,
+.profile-handle-input {
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 0.8rem 0.9rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--clr-white);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.profile-edit-form textarea {
+    resize: vertical;
+}
+
+.profile-handle-input {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.profile-handle-input input {
+    flex: 1;
+    color: var(--clr-white);
+    font-size: 0.95rem;
+}
+
+.profile-privacy-control {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+}
+
+.profile-privacy-control input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    appearance: auto;
+}
+
+.profile-privacy-control span {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.profile-save-button {
+    width: fit-content;
+    background: #f4f4ef;
+    color: #111216;
+}
+
+.profile-save-button:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.profile-empty,
+.profile-state {
+    color: rgba(255, 255, 255, 0.56);
+}
+
+.profile-state {
+    display: grid;
+    min-height: 70vh;
+    place-items: center;
 }
 
 @media screen and (max-width: 450px) {
@@ -117,5 +271,14 @@
     .user-details {
         margin-top: 0;
         gap: 0;
+    }
+
+    .profile-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .follow-container {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }

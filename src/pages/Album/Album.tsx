@@ -1,10 +1,10 @@
 import React from 'react'
-import AlbumComponent from "../../components/AlbumComponent/AlbumComponent"
+import { AlbumPage } from "../Entity/EntityPages"
 
 function Album() {
   return (
     <>
-      <AlbumComponent />
+      <AlbumPage />
     </>
   )
 }

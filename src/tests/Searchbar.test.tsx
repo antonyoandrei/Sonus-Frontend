@@ -1,87 +1,91 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import "@testing-library/jest-dom";
+import type { CatalogProvider } from "../catalog/catalog-provider";
+import { CatalogProviderProvider } from "../catalog/CatalogProviderProvider";
+import type { CatalogSearchResult } from "../catalog/catalog.types";
 import Searchbar from "../components/Searchbar/Searchbar";
 import { PlayerProvider } from "../context/PlayerContext";
-import "@testing-library/jest-dom";
 import { UserContextProvider } from "../context/UserContext";
 
-jest.mock("@auth0/auth0-react", () => ({
-  useAuth0: jest.fn(() => ({
-    getAccessTokenSilently: jest.fn(() => "mocked-access-token"),
-  })),
-}));
-
-jest.mock("swiper/modules", () => ({
-  Navigation: {
-    __esModule: true,
-    default: jest.fn(),
-  },
-}));
-
+jest.mock("swiper/modules", () => ({ Navigation: {} }));
 jest.mock("swiper/react", () => ({
-  __esModule: true,
-  Swiper: ({ children }: any) => (
-    <div className="mocked-swiper">{children}</div>
-  ),
-  SwiperSlide: ({ children }: any) => (
-    <div className="mocked-swiper-slide">{children}</div>
-  ),
+  Swiper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SwiperSlide: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
-
-jest.mock("../services/song.service", () => ({
-  getAllSongs: jest.fn(() => Promise.resolve([])),
-}));
-
-jest.mock("../services/playlist.service", () => ({
-  getAllPlaylists: jest.fn(() => Promise.resolve([])),
-}));
-
 jest.mock("../services/user.service", () => ({
-  getAllUsers: jest.fn(() => Promise.resolve([])),
+  getAllUsers: jest.fn().mockResolvedValue([]),
+}));
+jest.mock("../auth/useAuth", () => ({
+  useAuth: () => ({
+    isAuthenticated: false,
+    logout: jest.fn(),
+  }),
 }));
 
-describe("Searchbar Component", () => {
-  it("renders search results correctly for playlists and songs", async () => {
-    const mockPlaylists = [
-      { id: 1, name: "Mi carro", cover: "playlist-cover.jpg" },
-    ];
+const searchResult: CatalogSearchResult = {
+  tracks: [{
+    id: "track-1",
+    title: "Mi carro",
+    artists: [{ id: "artist-1", name: "Artist1", imageUrl: null, providerId: "sonus" }],
+    album: { id: "album-1", title: "Album1", coverUrl: null, providerId: "sonus" },
+    coverUrl: "song-cover.jpg",
+    streamUrl: "track.mp3",
+    durationMs: null,
+    year: null,
+    genres: [],
+    explicit: false,
+    playCount: 0,
+    providerId: "sonus",
+  }],
+  albums: [],
+  artists: [],
+  playlists: [{
+    id: "playlist-1",
+    title: "Mi carro",
+    coverUrl: "playlist-cover.jpg",
+    owner: null,
+    tracks: [],
+    providerId: "sonus",
+  }],
+  genres: [],
+};
 
-    const mockSongs = [
-      {
-        id: 1,
-        name: "Mi carro",
-        cover: "song-cover.jpg",
-        Artist: [{ name: "Artist1" }],
-        Album: [{ name: "Album1" }],
-      },
-    ];
+const provider: CatalogProvider = {
+  id: "sonus",
+  getHome: jest.fn(),
+  search: jest.fn().mockResolvedValue(searchResult),
+  getTrack: jest.fn(),
+  getAlbum: jest.fn(),
+  getArtist: jest.fn(),
+  getPlaylist: jest.fn(),
+  getGenre: jest.fn(),
+  getGenres: jest.fn(),
+};
 
-    require("../services/song.service").getAllSongs.mockResolvedValue(
-      mockSongs
-    );
-    require("../services/playlist.service").getAllPlaylists.mockResolvedValue(
-      mockPlaylists
-    );
-
+describe("Searchbar", () => {
+  it("renders normalized track and playlist results", async () => {
     render(
       <UserContextProvider>
         <PlayerProvider>
-          <Router>
-            <Searchbar />
-          </Router>
+          <CatalogProviderProvider provider={provider}>
+            <BrowserRouter>
+              <Searchbar />
+            </BrowserRouter>
+          </CatalogProviderProvider>
         </PlayerProvider>
-      </UserContextProvider>
+      </UserContextProvider>,
     );
 
-    const searchInput = screen.getByPlaceholderText("Search...");
-    fireEvent.change(searchInput, { target: { value: "Mi carro" } });
+    fireEvent.change(screen.getByPlaceholderText("Search..."), {
+      target: { value: "Mi carro" },
+    });
+
     await waitFor(() => {
-      waitFor(() => expect(screen.getByText("Playlists")).toBeInTheDocument());
-      waitFor(() =>
-        expect(screen.getAllByText("Mi carro")).toBeInTheDocument()
-      );
-      waitFor(() => expect(screen.getByText("All songs")).toBeInTheDocument());
+      expect(screen.getByText("Playlists")).toBeInTheDocument();
+      expect(screen.getAllByText("Mi carro")).toHaveLength(2);
+      expect(screen.getByText("All songs")).toBeInTheDocument();
     });
   });
 });

@@ -1,10 +1,10 @@
 import React from 'react'
-import PlaylistComponent from "../../components/PlaylistComponent/PlaylistComponent"
+import { PlaylistPage } from "../Entity/EntityPages"
 
 const Playlist = () => {
   return (
     <>
-      <PlaylistComponent />
+      <PlaylistPage />
     </>
   )
 }

@@ -11,6 +11,12 @@ jest.mock("../services/playlist.service", () => ({
   createPlaylistByUserId: jest.fn(),
 }));
 
+jest.mock("../auth/useAuth", () => ({
+  useAuth: () => ({
+    getAccessTokenSilently: jest.fn().mockResolvedValue("supabase-test-token"),
+  }),
+}));
+
 describe("PlaylistModal", () => {
   test("renders without crashing and request is made", async () => {
     const mockFile = new File(["test-image.png"], "test-image.png", {

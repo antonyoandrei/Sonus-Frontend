@@ -1,0 +1,4 @@
+.legal-page { --sonus-text: #f6f2ed; --sonus-muted: #a9a2a7; --sonus-accent: #ff5a66; }
+.legal-page article { max-width: 720px; border-top: 1px solid rgba(255, 255, 255, 0.14); padding-top: 2rem; }
+.legal-page article h2 { margin-bottom: 1rem; font-size: 1.5rem; font-weight: 650; }
+.legal-page article p { margin-bottom: 1rem; color: var(--sonus-muted); line-height: 1.65; }

@@ -1,9 +1,9 @@
-import { useState, useEffect, FC } from "react";
+import { useCallback, useEffect, useState, type FC } from "react";
 import "./add.song.modal.css";
 import React from 'react';
 import { useUserContext } from "../../utils/useUserContext";
-import { useAuth0 } from "@auth0/auth0-react";
-import { Playlist, Song } from "../../interfaces/models.interfaces";
+import { useAuth } from "../../auth/useAuth";
+import type { CatalogPlaylist, CatalogTrack } from "../../catalog/catalog.types";
 import toast from "react-hot-toast";
 import {
   addSongToPlaylist,
@@ -14,24 +14,24 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 interface AddSongModalProps {
-  song: Song | null;
+  song: CatalogTrack | null;
   updateSong: () => void;
 }
 
 const AddSongModal: FC<AddSongModalProps> = ({ song, updateSong }) => {
   const { currentUser } = useUserContext();
   const [isElementHidden, setIsElementHidden] = useState(true);
-  const { getAccessTokenSilently } = useAuth0();
-  const [playlists, setPlaylists] = useState([]);
+  const { getAccessTokenSilently } = useAuth();
+  const [playlists, setPlaylists] = useState<CatalogPlaylist[]>([]);
   const { id: playlistIdFromRoute } = useParams<{ id: string }>();
-  const isCurrentPlaylist = currentUser?.Playlist.some(
+  const isCurrentPlaylist = currentUser?.playlists.some(
     (playlist) => playlist.id === playlistIdFromRoute
   );
   const { t } = useTranslation();
 
-  const toggleElement = () => {
-    setIsElementHidden(!isElementHidden);
-  };
+  const toggleElement = useCallback(() => {
+    setIsElementHidden((isHidden) => !isHidden);
+  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (e: Event) => {
@@ -61,24 +61,20 @@ const AddSongModal: FC<AddSongModalProps> = ({ song, updateSong }) => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("keydown", handleEscapeKey);
     };
-  }, [isElementHidden, currentUser, toggleElement]);
+  }, [isElementHidden, toggleElement]);
 
   const onSubmit = async (selectedPlaylistId: string) => {
     try {
       if (selectedPlaylistId && currentUser) {
         const token = await getAccessTokenSilently();
-        const songAddedToPlaylist = await addSongToPlaylist(
+        await addSongToPlaylist(
           selectedPlaylistId,
           song?.id,
           currentUser?.id,
           token
         );
-        if (songAddedToPlaylist) {
-          toggleElement();
-          toast.success(t("Song added successfully!"));
-        } else {
-          toast.error(t("Error adding to playlist."));
-        }
+        toggleElement();
+        toast.success(t("Song added successfully!"));
       }
     } catch (error) {
       console.error(error);
@@ -111,16 +107,12 @@ const AddSongModal: FC<AddSongModalProps> = ({ song, updateSong }) => {
         console.error("Playlist ID or song ID is undefined");
         return;
       }
-      const isDeleted = await deleteSongFromPlaylist(
+      await deleteSongFromPlaylist(
         playlistIdFromRoute,
         song.id,
         token
       );
-      if (isDeleted) {
-        updateSong();
-      } else {
-        console.error("Failed to delete song from playlist");
-      }
+      updateSong();
     } catch (error) {
       console.error("Error deleting song from playlist:", error);
     }
@@ -138,13 +130,13 @@ const AddSongModal: FC<AddSongModalProps> = ({ song, updateSong }) => {
         ) : (
           <>
             <p className="modal-add-title">{t("Add to playlist")}</p>
-            {playlists.map((playlist: Playlist) => (
+            {playlists.map((playlist) => (
               <p
                 className="song-modal-titles"
                 key={playlist.id.toString()}
                 onClick={() => onSubmit(playlist.id)}
               >
-                {playlist?.name}
+                {playlist.title}
               </p>
             ))}
           </>

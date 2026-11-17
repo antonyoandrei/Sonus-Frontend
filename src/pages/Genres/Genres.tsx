@@ -1,10 +1,10 @@
 import React from 'react'
-import GenreComponent from "../../components/GenreComponent/GenreComponent"
+import { GenrePage } from "../Entity/EntityPages"
 
 function Genres() {
   return (
     <>
-      <GenreComponent />
+      <GenrePage />
     </>
   )
 }

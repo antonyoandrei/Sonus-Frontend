@@ -1,0 +1,430 @@
+/* ── Sonus Player ─────────────────────────────────────── */
+
+.sonus-now-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(24px) saturate(1.6);
+  animation: sonus-scrim-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sonus-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sonus-player {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 90;
+  display: grid;
+  grid-template-columns: minmax(200px, 1.1fr) minmax(300px, 1.6fr) minmax(140px, 0.9fr);
+  align-items: center;
+  gap: 1.2rem;
+  width: auto;
+  min-height: 86px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 0.75rem 1rem;
+  background: var(--sonus-glass, rgba(18, 18, 20, 0.65));
+  color: #fff;
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(40px) saturate(1.6);
+  transition:
+    border-radius 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sonus-player.is-expanded {
+  grid-template-columns: minmax(200px, 1.1fr) minmax(300px, 1.6fr) minmax(140px, 0.9fr);
+  align-items: end;
+  min-height: 0;
+  padding-top: 1rem;
+}
+
+.sonus-player__glow {
+  position: absolute;
+  inset: -50%;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  filter: blur(60px) saturate(1.5) brightness(0.8);
+  opacity: 0.3;
+  pointer-events: none;
+  transform: scale(1.3);
+  transition: opacity 800ms ease;
+}
+
+.sonus-player.is-playing .sonus-player__glow {
+  opacity: 0.4;
+}
+
+.sonus-player > *:not(.sonus-player__glow) {
+  position: relative;
+  z-index: 1;
+}
+
+.sonus-player.is-empty {
+  right: 16px;
+  left: 16px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  width: auto;
+  min-height: 74px;
+  margin: 0;
+}
+
+.sonus-player.is-empty .sonus-player__timeline,
+.sonus-player.is-empty .sonus-player__gain,
+.sonus-player.is-empty .sonus-player__queue {
+  display: none;
+}
+
+.sonus-player__track {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sonus-player__artwork {
+  display: block;
+  overflow: hidden;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sonus-player.is-playing .sonus-player__artwork {
+  transform: scale(1.02);
+}
+
+.sonus-player__artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sonus-player__artwork.is-empty {
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+  font-weight: 840;
+}
+
+.sonus-player__meta {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.sonus-player__meta strong,
+.sonus-player__meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sonus-player__meta strong {
+  font-size: 0.86rem;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.sonus-player__meta span {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.72rem;
+}
+
+.sonus-player__transport {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.sonus-player__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.sonus-player button,
+.sonus-player__queue {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition:
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sonus-player button:hover,
+.sonus-player button:focus-visible,
+.sonus-player__queue:hover,
+.sonus-player__queue:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sonus-player button:active {
+  transform: scale(0.92);
+}
+
+.sonus-player button:disabled,
+.sonus-player .is-disabled {
+  color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sonus-player button.is-on {
+  color: var(--sonus-accent, #ff375f);
+}
+
+.sonus-player .sonus-player__play {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 200ms ease,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sonus-player .sonus-player__play:hover,
+.sonus-player .sonus-player__play:focus-visible {
+  background: #fff;
+  color: #111;
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.sonus-player .sonus-player__play:active {
+  transform: scale(0.96);
+}
+
+.sonus-player__repeat {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.24);
+}
+
+.sonus-player__timeline {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sonus-player__timeline input,
+.sonus-player__gain {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) var(--progress, 0%), rgba(255, 255, 255, 0.15) var(--progress, 0%));
+  appearance: none;
+  cursor: pointer;
+  transition: height 200ms ease;
+}
+
+.sonus-player__timeline input:hover,
+.sonus-player__gain:hover {
+  height: 6px;
+}
+
+.sonus-player__timeline input::-webkit-slider-thumb,
+.sonus-player__gain::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  appearance: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.sonus-player__timeline input:hover::-webkit-slider-thumb,
+.sonus-player__gain:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.sonus-player__aside {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.sonus-player__gain {
+  width: 84px;
+  --progress: 86%;
+}
+
+/* ── Now Playing expanded ────── */
+.sonus-now {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0 1.2rem;
+  animation: sonus-now-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sonus-now-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.sonus-now__close {
+  justify-self: center;
+}
+
+.sonus-now__cover {
+  overflow: hidden;
+  width: min(48vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.5),
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sonus-player.is-playing .sonus-now__cover {
+  transform: scale(1.02);
+}
+
+.sonus-now__cover img,
+.sonus-now__cover span {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sonus-now__cover span {
+  display: grid;
+  place-items: center;
+  font-size: 4rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.sonus-now__copy {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  text-align: center;
+}
+
+.sonus-now__copy strong {
+  font-size: 1.4rem;
+  font-weight: 620;
+  letter-spacing: -0.03em;
+}
+
+.sonus-now__copy span,
+.sonus-now__copy small {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.82rem;
+}
+
+.sonus-now__queue {
+  display: grid;
+  width: min(100%, 440px);
+  gap: 0.3rem;
+}
+
+.sonus-now__queue li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  transition: background-color 200ms ease;
+}
+
+.sonus-now__queue li.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* ── Responsive ────── */
+@media (max-width: 760px) {
+  .sonus-player {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 72px;
+    border-radius: 18px;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .sonus-player__transport {
+    justify-self: end;
+  }
+
+  .sonus-player__timeline,
+  .sonus-player__aside,
+  .sonus-player__repeat,
+  .sonus-player__controls > button:first-child {
+    display: none;
+  }
+
+  .sonus-now__cover {
+    width: min(72vw, 260px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sonus-player button,
+  .sonus-player__artwork,
+  .sonus-now__cover,
+  .sonus-now-scrim,
+  .sonus-now {
+    animation: none !important;
+    transition: none !important;
+  }
+}

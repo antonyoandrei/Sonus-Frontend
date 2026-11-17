@@ -1,0 +1,9 @@
+.sonus-route-loader { display: grid; min-height: calc(100dvh - 76px); place-items: center; align-content: center; gap: 1rem; background: #121114; color: #f6f2ed; }
+.sonus-route-loader__mark { display: grid; width: 74px; aspect-ratio: 1; place-items: center; border-radius: 50%; background: #ff5a66; color: #2c1116; font-size: 1.4rem; font-weight: 800; }
+.sonus-route-loader__copy { color: #a9a2a7; font-size: 0.65rem; font-weight: 680; letter-spacing: 0.08em; text-transform: uppercase; }
+.sonus-route-loader__signal { display: flex; height: 24px; align-items: center; gap: 4px; }
+.sonus-route-loader__signal i { width: 2px; height: 100%; background: #ff5a66; transform: scaleY(0.2); animation: sonus-route-pulse 620ms ease-in-out infinite alternate; }
+.sonus-route-loader__signal i:nth-child(2), .sonus-route-loader__signal i:nth-child(4) { animation-delay: -260ms; }
+.sonus-route-loader__signal i:nth-child(3) { animation-delay: -440ms; }
+@keyframes sonus-route-pulse { to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .sonus-route-loader__signal i { animation: none; transform: scaleY(0.55); } }

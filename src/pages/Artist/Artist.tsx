@@ -1,10 +1,10 @@
 import React from 'react'
-import ArtistComponent from "../../components/ArtistComponent/ArtistComponent"
+import { ArtistPage } from "../Entity/EntityPages"
 
 const Artist = () => {
   return (
     <>
-      <ArtistComponent />
+      <ArtistPage />
     </>
   )
 }

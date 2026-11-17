@@ -1,13 +1,13 @@
 import React from 'react'
-import { useState, useEffect, ChangeEvent } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 import "./playlist.modal.css";
 import { useUserContext } from "../../utils/useUserContext";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "../../auth/useAuth";
 import { uploadRequest } from "../../services/upload.service";
-import { Playlist } from "../../interfaces/models.interfaces";
 import toast from "react-hot-toast";
 import { createPlaylistByUserId } from "../../services/playlist.service";
 import { useTranslation } from "react-i18next";
+import type { CreatePlaylistInput } from "../../personal/personal.types";
 
 type PlaylistModalProps = {
   updatePlaylists: () => void;
@@ -16,15 +16,15 @@ type PlaylistModalProps = {
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
   const { currentUser } = useUserContext();
   const [isElementHidden, setIsElementHidden] = useState(true);
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently } = useAuth();
   const [imgSrc, setImgSrc] = useState<string | null>();
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [playlist, setPlaylist] = useState<CreatePlaylistInput>({ title: "", coverUrl: "" });
   const [file, setFile] = useState<File>();
   const { t } = useTranslation();
 
-  const toggleElement = () => {
-    setIsElementHidden(!isElementHidden);
-  };
+  const toggleElement = useCallback(() => {
+    setIsElementHidden((isHidden) => !isHidden);
+  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (e: Event) => {
@@ -54,7 +54,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("keydown", handleEscapeKey);
     };
-  }, [isElementHidden, currentUser, toggleElement]);
+  }, [isElementHidden, toggleElement]);
 
   const handleChange = async (e: ChangeEvent<HTMLInputElement> | null) => {
     if (e && e.target && e.target.files && e.target.files.length !== null) {
@@ -67,21 +67,13 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
 
   const onSubmit = async () => {
     try {
-      if (playlist && playlist.name && file) {
+      if (playlist.title && file) {
         const token = getAccessTokenSilently();
         const uploadedImageUrl = await uploadRequest(file);
         if (uploadedImageUrl) {
-          const newPlaylist: Playlist = {
-            name: playlist.name,
-            cover: uploadedImageUrl,
-            numSong: playlist.numSong,
-            songId: playlist.songId,
-            userId: currentUser?.id,
-            likedPlaylist: playlist.likedPlaylist,
-            id: playlist.id,
-            liked: playlist.liked,
-            User: playlist.User,
-            Playlist: [],
+          const newPlaylist: CreatePlaylistInput = {
+            title: playlist.title,
+            coverUrl: uploadedImageUrl,
           };
           const response = await createPlaylistByUserId(
             newPlaylist,
@@ -89,11 +81,10 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
             await token
           );
           if (response) {
-            setPlaylist(response);
             toggleElement();
             updatePlaylists();
             toast.success(t("Playlist created successfully!"));
-            setPlaylist(null);
+            setPlaylist({ title: "", coverUrl: "" });
             setFile(undefined);
             setImgSrc(null);
           } else {
@@ -110,13 +101,9 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setPlaylist(
-      (prevPlaylist) =>
-        ({
-          ...prevPlaylist,
-          [name]: value,
-        } as Playlist)
-    );
+    if (name === "title") {
+      setPlaylist((current) => ({ ...current, title: value }));
+    }
   };
 
   return (
@@ -157,8 +144,8 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ updatePlaylists }) => {
               type="text"
               placeholder={t("Name...")}
               autoComplete="off"
-              name="name"
-              value={playlist?.name || ""}
+              name="title"
+              value={playlist.title}
               onChange={handleInputChange}
             />
           </form>
